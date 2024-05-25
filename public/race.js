@@ -15,6 +15,8 @@ let baseLevel = 650;
 
 let atLightSpeed = false;
 
+let scoreBoard = [];
+
 let player = {
   name: "player",
   x: 10,
@@ -71,7 +73,7 @@ function preload() {
 function shuffle(unshuffled) {
   return unshuffled
     .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
+    .sort((a, b) => b.sort - a.sort)
     .map(({ value }) => value);
 }
 
@@ -79,6 +81,7 @@ function setup() {
   createCanvas(WIDTH, HEIGHT);
   frameRate(60);
   oponents = shuffle(allOponents).slice(0, 2);
+  scoreBoard = JSON.parse(localStorage.getItem("scoreBoard")) || [];
 }
 
 let winner = "unknown";
@@ -90,21 +93,38 @@ function drawImageEntity(imageEntity) {
 function drawWinner(winner) {
   if (winner !== "unknown") {
     textSize(100);
+    const x = 300;
+    const y = 150;
     if (winner === "player") {
-      text("🏆 You win! 🏆", 300, HEIGHT / 2);
+      text("🏆 You win! 🏆", x, y);
+      const lineHeight = 100;
+      textSize(70);
+      textFont("Courier New");
+      scoreBoard.forEach((score, index) => {
+        let entry =
+          score.name.padEnd(10, ".") + score.score.toString().padStart(5, "0");
+        text(entry, x, y + lineHeight * (index + 1));
+      });
     } else {
-      text("😞 Too slow. 😞", 300, HEIGHT / 2);
+      text("😞 Too slow. 😞", x, y);
     }
   }
 }
-
-function drawOponents() {}
 
 function determineWinner() {
   if (winner === "unknown") {
     if (player.x >= WIDTH) {
       console.log("player wins");
       winner = "player";
+      let playerName = prompt("Enter your name for the high score board");
+      const score = (WIDTH - frameCount) * 10;
+      scoreBoard.push({ name: playerName, score: score });
+      scoreBoard.sort((a, b) => b.score - a.score);
+      while (scoreBoard.length > 5) {
+        scoreBoard.pop();
+      }
+      localStorage.setItem("scoreBoard", JSON.stringify(scoreBoard));
+      console.log(scoreBoard);
     } else {
       oponents.forEach((oponent) => {
         if (oponent.x >= WIDTH) {
@@ -116,8 +136,14 @@ function determineWinner() {
   }
 }
 
+function drawInstructions() {
+  textSize(20);
+  text("📋Alternate a/s or j/k to race; f to toggle fullscreen", 40, 840);
+}
+
 function drawScene() {
   image(backgroundImg, 0, 0);
+  drawInstructions();
   oponents.forEach((oponent) => {
     drawImageEntity(oponent);
   });
