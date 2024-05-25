@@ -13,7 +13,7 @@ const HEIGHT = 900;
 
 let baseLevel = 650;
 
-let areWeLightSpeed = false;
+let atLightSpeed = false;
 
 let player = {
   name: "player",
@@ -94,7 +94,7 @@ function drawScene() {
   oponents.forEach((oponent) => {
     drawImageEntity(oponent);
   });
-  if (areWeLightSpeed) {
+  if (atLightSpeed) {
     image(lightSpeedImg, 0, 0);
   }
   drawImageEntity(player);
@@ -126,7 +126,7 @@ class DataWindow {
   }
 }
 
-const playerSpeedDataWindowSize = 2;
+const playerSpeedDataWindowSize = 3;
 let playerSpeedData = new DataWindow(playerSpeedDataWindowSize);
 
 function movePlayer() {
@@ -147,22 +147,22 @@ function keyTyped() {
   return false;
 }
 
-const lightSpeedBarrier = 12;
+const lightSpeedBarrier = 14;
 let lastMoveFrame = 0;
 
-function checkIfWeAreLightSpeed() {
+function areWeLightSpeedYet() {
   if (playerSpeedData.data.length === playerSpeedDataWindowSize) {
     let firstFrame = playerSpeedData.data[0];
     let lastFrame = playerSpeedData.data[playerSpeedDataWindowSize - 1];
     let frames = lastFrame - firstFrame;
 
-    areWeLightSpeed =
-      frames <= lightSpeedBarrier && lastFrame + 30 > frameCount;
+    atLightSpeed =
+      frames <= lightSpeedBarrier && lastFrame + lightSpeedBarrier > frameCount;
   }
 }
 
 function draw() {
-  checkIfWeAreLightSpeed();
+  areWeLightSpeedYet();
   movePlayer();
   moveOponents();
   determineWinner();
