@@ -70,13 +70,6 @@ function preload() {
   anikin.img = loadImage("assets/anikin.jpg");
 }
 
-function shuffle(unshuffled) {
-  return unshuffled
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => b.sort - a.sort)
-    .map(({ value }) => value);
-}
-
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   frameRate(60);
