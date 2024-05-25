@@ -23,35 +23,62 @@ let player = {
   speed: 35,
 };
 
-let oponent1 = {
-  name: "oponent1",
+let drone = {
+  name: "drone",
   x: 0,
   y: baseLevel - 100,
   img: null,
   speed: 1,
 };
 
-let oponent2 = {
-  name: "oponent2",
+let anikin = {
+  name: "anikin",
   x: 0,
   y: baseLevel,
   img: null,
   speed: 2,
 };
 
-let oponents = [oponent1, oponent2];
+let greenSpeeder = {
+  name: "greenSpeeder",
+  x: 0,
+  y: baseLevel,
+  img: null,
+  speed: 2.5,
+};
+
+let mixedSpeeder = {
+  name: "mixedSpeeder",
+  x: 0,
+  y: baseLevel,
+  img: null,
+  speed: 3,
+};
+
+let allOponents = [drone, anikin, greenSpeeder, mixedSpeeder];
+let oponents = [];
 
 function preload() {
   lightSpeedImg = loadImage("assets/lightspeed.jpg");
   backgroundImg = loadImage("assets/desert.jpg");
   player.img = loadImage("assets/shuttle.jpg");
-  oponent1.img = loadImage("assets/drone.jpg");
-  oponent2.img = loadImage("assets/anikin.jpg");
+  drone.img = loadImage("assets/drone.jpg");
+  greenSpeeder.img = loadImage("assets/green.jpg");
+  mixedSpeeder.img = loadImage("assets/mix.jpg");
+  anikin.img = loadImage("assets/anikin.jpg");
+}
+
+function shuffle(unshuffled) {
+  return unshuffled
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
 }
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   frameRate(60);
+  oponents = shuffle(allOponents).slice(0, 2);
 }
 
 let winner = "unknown";
@@ -147,7 +174,7 @@ function keyTyped() {
   return false;
 }
 
-const lightSpeedBarrier = 14;
+const lightSpeedBarrier = 15;
 let lastMoveFrame = 0;
 
 function areWeLightSpeedYet() {
