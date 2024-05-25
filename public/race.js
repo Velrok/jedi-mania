@@ -42,7 +42,7 @@ let oponent2 = {
 let oponents = [oponent1, oponent2];
 
 function preload() {
-  lightSpeedImg = loadImage("/assets/lightspeed.jpg");
+  lightSpeedImg = loadImage("assets/lightspeed.jpg");
   backgroundImg = loadImage("assets/desert.jpg");
   player.img = loadImage("assets/shuttle.jpg");
   oponent1.img = loadImage("assets/drone.jpg");
