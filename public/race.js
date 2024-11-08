@@ -8,6 +8,21 @@ const J_KEY = 74;
 const K_KEY = 75;
 const F_KEY = 70;
 
+const X_BUTTON = 0;
+const CIRCLE_BUTTON = 1;
+const SQUARE_BUTTON = 2;
+const TRIANGE_BUTTON = 3;
+
+const L1 = 4;
+const L2 = 6; // analog
+const R1 = 5;
+const R2 = 7; // analog
+
+const DPAD_UP = 12;
+const DPAD_down = 13;
+const DPAD_left = 14;
+const DPAD_right = 15;
+
 const WIDTH = 1200;
 const HEIGHT = 900;
 
@@ -177,11 +192,20 @@ const playerSpeedDataWindowSize = 3;
 let playerSpeedData = new DataWindow(playerSpeedDataWindowSize);
 
 function movePlayer() {
+  var gamepads = navigator.getGamepads();
+  let controller = gamepads[0]; //controllers[i]
+
   if (keyIsPressed) {
     if (targetKeySet.includes(keyCode)) {
       player.x += player.speed;
       playerSpeedData.addData(frameCount);
       targetKeySet = targetKeySet === KEY_SET_1 ? KEY_SET_2 : KEY_SET_1;
+    }
+  } else if (controller && controller.buttons[L1]) {
+    let val = controller.buttons[L2].value;
+    console.log(val);
+    if (val > 0.02) {
+      player.x += 13 * val;
     }
   }
 }
@@ -213,7 +237,7 @@ function draw() {
   movePlayer();
   moveOponents();
   determineWinner();
-  drawGamepad();
+  // drawGamepad();
 
   drawScene();
 }
@@ -266,15 +290,15 @@ function drawGamepad() {
         }
       }
     }
-    if (controller.axes) {
-      let axes = controller.axes;
-      for (let axis = 0; axis < axes.length; axis++) {
-        let val = controller.axes[axis];
-        if (val !== 0) {
-          console.log("axis", axis, val);
-        }
-      }
-    }
+    // if (controller.axes) {
+    //   let axes = controller.axes;
+    //   for (let axis = 0; axis < axes.length; axis++) {
+    //     let val = controller.axes[axis];
+    //     if (val !== 0) {
+    //       console.log("axis", axis, val);
+    //     }
+    //   }
+    // }
   }
 }
 
