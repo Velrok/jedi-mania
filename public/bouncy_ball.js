@@ -17,11 +17,13 @@ function setup() {
   height = windowHeight * 0.95;
   player = new Entity2d(playerImg);
   // player.scale = createVector(1 / 10, 1 / 10);
-  player.position = createVector(20, -300);
+  player.position = createVector(20, -100);
   player.speed = createVector(3, -20);
+  player.rotation_speed = 1 / 10;
   player.size = createVector(50, 50);
   player.acceleration = createVector(0, 0);
   player.bounce = true;
+  player.bounce_factor = 0.5;
 
   center = createVector(20, height - 20);
 
