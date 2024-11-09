@@ -5,11 +5,12 @@ class Entity2d {
     this.position = createVector(0, 0);
     this.speed = createVector(0, 0);
     this.acceleration = createVector(0, 0);
-    this.gravity = createVector(0, 0.1);
+    this.gravity = createVector(0, 1 / 15);
     this.rotation_speed = 0.0;
     this.rotation = 0;
     this.scale = createVector(1, 1);
     this.bounce = false;
+    this.bounce_factor = 0.3;
     this.drag_factor = 0.99;
   }
 
@@ -24,6 +25,7 @@ class Entity2d {
     translate(this.position.x, this.position.y);
 
     push();
+    rotate(this.rotation);
     scale(this.size.x / this.image.width, this.size.y / this.image.height);
     translate(-this.image.width / 2, -this.image.height / 2);
     image(this.image, 0, 0);
@@ -52,6 +54,7 @@ class Entity2d {
 
   update() {
     this.rotation += this.rotation_speed;
+    this.rotation_speed *= this.drag_factor;
 
     if (this.bounce && this.position.y > 0) {
       // console.log(this.position.y);
@@ -59,7 +62,7 @@ class Entity2d {
 
       this.position.y = 0;
       // this.speed.y = this.speed.y / -3;
-      this.speed.y *= -0.4;
+      this.speed.y *= -this.bounce_factor;
       // this.acceleration.y = this.acceleration.y * -0.4;
       this.acceleration.y = 0;
       // this.acceleration.y *= -1;
