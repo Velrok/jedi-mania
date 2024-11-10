@@ -17,11 +17,6 @@ class Entity2d {
   render(debug = false) {
     push();
 
-    // rotate(this.rotation);
-    // scale(this.scale.x, this.scale.y);
-
-    // console.log(this.position.x, this.position.y);
-
     translate(this.position.x, this.position.y);
 
     push();
@@ -32,8 +27,9 @@ class Entity2d {
     pop();
 
     if (debug) {
-      // fill("yellow");
-      // circle(0, 0, this.size.x);
+      noFill();
+      let halfSize = this.size.copy().mult(0.5);
+      rect(-halfSize.x, -halfSize.y, this.size.x, this.size.y);
 
       stroke("blue");
       strokeWeight(2);
@@ -56,16 +52,10 @@ class Entity2d {
     this.rotation += this.rotation_speed;
     this.rotation_speed *= this.drag_factor;
 
-    if (this.bounce && this.position.y > 0) {
-      // console.log(this.position.y);
-      // console.log(this.speed.y);
-
-      this.position.y = 0;
-      // this.speed.y = this.speed.y / -3;
+    if (this.bounce && this.position.y + this.size.y / 2 > 0) {
+      this.position.y = -this.size.y / 2;
       this.speed.y *= -this.bounce_factor;
-      // this.acceleration.y = this.acceleration.y * -0.4;
       this.acceleration.y = 0;
-      // this.acceleration.y *= -1;
     }
 
     this.acceleration.add(this.gravity);
