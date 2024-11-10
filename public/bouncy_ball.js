@@ -1,13 +1,16 @@
 let width;
 let height;
 let ball1;
+let ball2;
 let entities = [];
 let ballImg;
+let ball2Img;
 let center;
 let debug = false;
 
 function preload() {
   ballImg = loadImage("assets/ball.png");
+  ball2Img = loadImage("assets/ball_02a.png");
   grasImg = loadImage("assets/gras.png");
 }
 
@@ -21,6 +24,15 @@ function resetBall1() {
   ball1.bounce_factor = 0.5;
 }
 
+function resetBall2() {
+  ball2.position = createVector(width - 10, -height);
+  ball2.speed = createVector(-10, 0);
+  ball2.rotation_speed = -1 / 10;
+  ball2.size = createVector(60, 60);
+  ball2.bounce = true;
+  ball2.bounce_factor = 0.4;
+}
+
 function setup() {
   frameRate(60);
 
@@ -30,12 +42,15 @@ function setup() {
   ball1 = new Entity2d(ballImg);
   resetBall1();
 
+  ball2 = new Entity2d(ball2Img);
+  resetBall2();
+
   center = createVector(20, height);
 
   entities.push(ball1);
+  entities.push(ball2);
 
   createCanvas(width, height);
-  background(200);
 }
 
 function keyPressed() {
@@ -45,6 +60,7 @@ function keyPressed() {
       break;
     case "r":
       resetBall1();
+      resetBall2();
       break;
   }
 }
@@ -52,7 +68,7 @@ function keyPressed() {
 function draw() {
   // TODO: make it so everything can be defined in gloabl coords
   // but  will be translated into local coords for drawing
-  background(200);
+  background("#CCFFFF");
 
   drawFloor();
 
