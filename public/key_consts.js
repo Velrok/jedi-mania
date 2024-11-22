@@ -5,6 +5,7 @@ const J_KEY = 74;
 const K_KEY = 75;
 const S_KEY = 83;
 
+// PS4 Controller
 const X_BUTTON = 0;
 const CIRCLE_BUTTON = 1;
 const SQUARE_BUTTON = 2;
