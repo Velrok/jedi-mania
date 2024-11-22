@@ -4,6 +4,7 @@ class Entity2d {
     this.size = createVector(10, 10);
     this.position = createVector(0, 0);
     this.speed = createVector(0, 0);
+    this.maxSpeed = 10;
     this.acceleration = createVector(0, 0);
     this.gravity = createVector(0, 1 / 15);
     this.rotation_speed = 0.0;
@@ -61,6 +62,7 @@ class Entity2d {
     this.acceleration.add(this.gravity);
     this.speed.add(this.acceleration);
     this.speed.mult(this.drag_factor);
+    this.speed.limit(this.maxSpeed);
     this.position.add(this.speed);
   }
 }
