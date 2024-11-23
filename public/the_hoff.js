@@ -9,9 +9,11 @@ let center;
 let reloading = 0;
 let debug = false;
 let viewPort;
+let backgroundImgScale;
+let levelDimensions;
 
 function preload() {
-  payerImg = loadImage("assets/scout_trouper.png");
+  playerImg = loadImage("assets/scout_trouper.png");
   cloneTroupersImg = loadImage("assets/clone_troupers.png");
   riderCloneImg = loadImage("assets/rider_clone.png");
   backgroundImg = loadImage("assets/theHoff.png");
@@ -24,24 +26,34 @@ function setup() {
   width = windowWidth * 0.99;
   height = windowHeight * 0.95;
 
+  backgroundImgScale = 1 / 4;
+
+  levelDimensions = createVector(
+    backgroundImg.width * backgroundImgScale,
+    backgroundImg.height * backgroundImgScale
+  );
+
   viewPort = {
     size: createVector(width, height),
     position: createVector(width / 2, height / 2),
   };
 
-  payer = new Entity2d(payerImg);
-  payer.size = createVector(500, 500);
-  payer.position = createVector(payer.size.x / 2, -payer.size.y / 2);
-  payer.gravity = createVector(0, 0);
-  entities.push(payer);
+  player = new Entity2d(playerImg, 1 / 10);
+  player.position = createVector(player.size.x, player.size.y);
+  player.levelBoundry = {
+    topLeft: createVector(0, levelDimensions.y - 1),
+    bottomRight: createVector(levelDimensions.x - 1, 0),
+  };
+  player.gravity = createVector(0, 0);
+  player.maxSpeed = 15;
+  entities.push(player);
 
-  cloneTroupers = new Entity2d(cloneTroupersImg);
-  cloneTroupers.position = createVector(850, -100);
-  cloneTroupers.speed = createVector(0, -10);
-  cloneTroupers.size = createVector(300, 150);
-  cloneTroupers.gravity = createVector(0, 0);
-  cloneTroupers.drag_factor = 1;
-  entities.push(cloneTroupers);
+  // cloneTroupers = new Entity2d(cloneTroupersImg, 1 / 100);
+  // cloneTroupers.position = createVector(850, -100);
+  // cloneTroupers.speed = createVector(0, -10);
+  // cloneTroupers.gravity = createVector(0, 0);
+  // cloneTroupers.drag_factor = 1;
+  // entities.push(cloneTroupers);
 
   // riderClone = new Entity2d(riderCloneImg);
   // riderClone.position = createVector(20, -100);
@@ -54,11 +66,12 @@ function setup() {
 
 function draw() {
   handleGamepad();
+  handleKeyboard();
   enemyAI();
 
   push();
   translateToViewPort();
-  // renderBackground();
+  renderBackground();
 
   entities.forEach((entity) => {
     push();
@@ -66,22 +79,16 @@ function draw() {
     pop();
     entity.update();
   });
-  pop();
-
-  reloading -= 1;
-
-  entities = entities.filter((entity) => {
-    return (
-      entity.position.x < width &&
-      entity.position.y < height &&
-      entity.position.y > -height &&
-      entity.position.x > -width
-    );
-  });
 
   if (debug) {
     drawCoordSystem();
   }
+
+  pop();
+
+  reloading -= 1;
+
+  entities = filterOutDeadEntities(entities);
 
   // pop();
 
@@ -89,23 +96,51 @@ function draw() {
     let fps = frameRate();
     text(fps, 50, 50);
     text(entities.length, 50, 65);
-    // console.log(entities.length);
+  }
+}
+
+function filterOutDeadEntities(entities) {
+  return entities.filter((entity) => {
+    return (
+      entity.position.x < width &&
+      entity.position.y < height &&
+      entity.position.y > -height &&
+      entity.position.x > -width
+    );
+  });
+}
+
+function handleKeyboard() {
+  const speed = 10;
+  if (keyIsDown(J_KEY)) {
+    // Down
+    moveViewPort(createVector(0, -speed));
+  }
+  if (keyIsDown(K_KEY)) {
+    // Up
+    moveViewPort(createVector(0, speed));
+  }
+  if (keyIsDown(H_KEY)) {
+    // Left
+    moveViewPort(createVector(-speed, 0));
+  }
+  if (keyIsDown(L_KEY)) {
+    // Right
+    moveViewPort(createVector(speed, 0));
   }
 }
 
 function translateToViewPort() {
   translate(
-    viewPort.position.x - viewPort.size.x / 2,
+    -(viewPort.position.x - viewPort.size.x / 2),
     viewPort.position.y + viewPort.size.y / 2
   );
 }
 
 function renderBackground() {
   push();
-  let factor = 1 / 4;
-  translate(-520, 0);
-  scale(factor, factor);
-  image(backgroundImg, 0, 0);
+  scale(backgroundImgScale, backgroundImgScale);
+  image(backgroundImg, 0, -backgroundImg.height);
   pop();
 }
 
@@ -120,17 +155,20 @@ function handleGamepad() {
     // console.log(controller.buttons[11]);
 
     leftXAxis = controller.axes[0];
-    leftYAxis = controller.axes[1];
+    leftYAxis = -controller.axes[1];
 
-    payer.speed.x = leftXAxis * payer.maxSpeed;
-    payer.speed.y = leftYAxis * payer.maxSpeed;
+    player.speed.x = round(leftXAxis, 1) * player.maxSpeed;
+    player.speed.y = round(leftYAxis, 1) * player.maxSpeed;
+
+    let offset = createVector(player.size.x / 2 + 4, -player.size.y / 4);
+    let laserSpeed = 20;
 
     if (controller.buttons[R1].pressed && reloading <= 0) {
       reloading = 10;
       laserShot = new Entity2d(laserShotImg);
-      laserShot.position = payer.position.copy();
+      laserShot.position = player.position.copy().add(offset);
       laserShot.size = createVector(20, 10);
-      laserShot.speed = createVector(25, 0);
+      laserShot.speed = createVector(laserSpeed, 0);
       laserShot.gravity = createVector(0, 0);
       laserShot.drag_factor = 1;
 
@@ -143,30 +181,52 @@ function handleGamepad() {
 }
 
 function enemyAI() {
-  fill("red");
-  strokeWeight(12);
-  line(-width, 0, width, 0);
-  fill("yellow");
-  line(0, -height, 0, height);
+  // fill("red");
+  // strokeWeight(12);
+  // line(-width, 0, width, 0);
+  // fill("yellow");
+  // line(0, -height, 0, height);
   // if (cloneTroupers.position.y >= height || cloneTroupers.position.y <= 0) {
   //   cloneTroupers.speed.y *= -1;
   // }
 }
 
-function drawFloor() {
-  // let w = grasImg.width / 10;
-  // let h = grasImg.height / 10;
-  // let y = center.y - h;
-  // for (let i = 0; i < width / w; i++) {
-  // image(grasImg, i * w, y, w, h);
-  // }
+function keyPressed() {
+  if (keyCode === D_KEY) {
+    debug = !debug;
+    if (debug) {
+      console.log("Debug mode enabled");
+    } else {
+      console.log("Debug mode disabled");
+    }
+  }
+}
+
+function moveViewPort(direction) {
+  viewPort.position.add(direction);
+
+  let bgWidth = backgroundImg.width * backgroundImgScale;
+  let bgHeight = backgroundImg.height * backgroundImgScale;
+
+  viewPort.position.x = constrain(
+    viewPort.position.x,
+    width / 2,
+    bgWidth - width / 2
+  );
+
+  viewPort.position.y = constrain(
+    viewPort.position.y,
+    height / 2,
+    bgHeight - height / 2
+  );
 }
 
 function drawCoordSystem() {
-  stroke("lightgrey");
-  strokeWeight(2);
+  stroke("red");
+  strokeWeight(3);
   // x axis
-  line(-width, 0, width, 0);
+  line(0, 0, width / 2, 0);
   // y axis
-  line(0, -height, 0, height);
+  stroke("green");
+  line(0, 0, 0, height / 2);
 }

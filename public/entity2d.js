@@ -1,24 +1,24 @@
 class Entity2d {
-  constructor(image) {
+  constructor(image, scale = 1) {
     this.image = image;
-    this.size = createVector(10, 10);
+    this.size = createVector(image.width * scale, image.height * scale);
     this.position = createVector(0, 0);
     this.speed = createVector(0, 0);
-    this.maxSpeed = 10;
     this.acceleration = createVector(0, 0);
     this.gravity = createVector(0, 1 / 15);
     this.rotation_speed = 0.0;
     this.rotation = 0;
-    this.scale = createVector(1, 1);
     this.bounce = false;
     this.bounce_factor = 0.3;
     this.drag_factor = 0.99;
+    this.maxSpeed = null;
+    this.levelBoundry = null;
   }
 
   render(debug = false) {
     push();
 
-    translate(this.position.x, this.position.y);
+    translate(this.position.x, -this.position.y);
 
     push();
     rotate(this.rotation);
@@ -30,6 +30,7 @@ class Entity2d {
     if (debug) {
       noFill();
       let halfSize = this.size.copy().mult(0.5);
+      stroke("white");
       rect(-halfSize.x, -halfSize.y, this.size.x, this.size.y);
 
       stroke("blue");
@@ -62,7 +63,23 @@ class Entity2d {
     this.acceleration.add(this.gravity);
     this.speed.add(this.acceleration);
     this.speed.mult(this.drag_factor);
-    this.speed.limit(this.maxSpeed);
-    this.position.add(this.speed);
+    if (this.maxSpeed) {
+      this.speed.limit(this.maxSpeed);
+    }
+    if (this.levelBoundry) {
+      this.position.add(this.speed);
+
+      this.position.x = constrain(
+        this.position.x,
+        this.levelBoundry.topLeft.x,
+        this.levelBoundry.bottomRight.x
+      );
+
+      this.position.y = constrain(
+        this.position.y,
+        this.levelBoundry.bottomRight.y,
+        this.levelBoundry.topLeft.y
+      );
+    }
   }
 }
