@@ -1,8 +1,10 @@
 const A_KEY = 65;
 const D_KEY = 68;
 const F_KEY = 70;
+const H_KEY = 72;
 const J_KEY = 74;
 const K_KEY = 75;
+const L_KEY = 76;
 const S_KEY = 83;
 
 // PS4 Controller
