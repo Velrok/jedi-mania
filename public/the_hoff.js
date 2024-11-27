@@ -11,6 +11,7 @@ let debug = false;
 let viewPort;
 let backgroundImgScale;
 let levelDimensions;
+let levelBoundry;
 
 function preload() {
   playerImg = loadImage("assets/scout_trouper.png");
@@ -38,12 +39,14 @@ function setup() {
     position: createVector(width / 2, height / 2),
   };
 
-  player = new Entity2d(playerImg, 1 / 10);
-  player.position = createVector(player.size.x, player.size.y);
-  player.levelBoundry = {
+  levelBoundry = {
     topLeft: createVector(0, levelDimensions.y - 1),
     bottomRight: createVector(levelDimensions.x - 1, 0),
   };
+
+  player = new Entity2d(playerImg, 1 / 10);
+  player.position = createVector(player.size.x, player.size.y);
+  player.levelBoundry = levelBoundry;
   player.gravity = createVector(0, 0);
   player.maxSpeed = 15;
   entities.push(player);
@@ -67,6 +70,7 @@ function setup() {
 function draw() {
   handleGamepad();
   handleKeyboard();
+  updateViewPort();
   enemyAI();
 
   push();
@@ -90,13 +94,27 @@ function draw() {
 
   entities = filterOutDeadEntities(entities);
 
-  // pop();
-
   if (debug) {
     let fps = frameRate();
     text(fps, 50, 50);
     text(entities.length, 50, 65);
   }
+}
+
+function updateViewPort() {
+  viewPort.position = player.position.copy();
+
+  viewPort.position.x = constrain(
+    viewPort.position.x,
+    levelBoundry.topLeft.x + viewPort.size.x / 2,
+    levelBoundry.bottomRight.x - viewPort.size.x / 2,
+  );
+
+  viewPort.position.y = constrain(
+    viewPort.position.y,
+    levelBoundry.bottomRight.y + viewPort.size.y / 2,
+    levelBoundry.topLeft.y - viewPort.size.y / 2,
+  );
 }
 
 function filterOutDeadEntities(entities) {
@@ -149,16 +167,17 @@ function handleGamepad() {
   let controller = gamepads[0]; //controllers[i]
 
   if (controller) {
-    // console.log(controller.buttons[8]);
-    // console.log(controller.buttons[9]);
-    // console.log(controller.buttons[10]);
-    // console.log(controller.buttons[11]);
-
     leftXAxis = controller.axes[0];
     leftYAxis = -controller.axes[1];
 
+    // rightXAxis = controller.axes[2];
+    // rightYAxis = -controller.axes[3];
+
     player.speed.x = round(leftXAxis, 1) * player.maxSpeed;
     player.speed.y = round(leftYAxis, 1) * player.maxSpeed;
+
+    // viewPort.position.x += round(rightXAxis, 1) * 10;
+    // viewPort.position.y += round(rightYAxis, 1) * 10;
 
     let offset = createVector(player.size.x / 2 + 4, -player.size.y / 4);
     let laserSpeed = 20;
