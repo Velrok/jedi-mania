@@ -13,6 +13,7 @@ class Entity2d {
     this.bounce_factor = 0.3;
     this.drag_factor = 0.99;
     this.maxSpeed = null;
+    this.lifeTime = null;
   }
 
   render(debug = false) {
@@ -53,6 +54,10 @@ class Entity2d {
   update() {
     this.rotation += this.rotation_speed;
     this.rotation_speed *= this.drag_factor;
+
+    if (this.lifeTime) {
+      this.lifeTime -= 1;
+    }
 
     if (this.bounce && this.position.y + this.size.y / 2 > 0) {
       this.position.y = -this.size.y / 2;
