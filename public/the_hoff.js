@@ -59,6 +59,8 @@ function draw() {
   handleKeyboard();
   updateViewPort();
   enemyAI();
+  handleEnemyCollision();
+  handleLaserCollision();
 
   push();
   translateToViewPort();
@@ -107,6 +109,7 @@ function updateViewPort() {
 function filterOutDeadEntities(entities) {
   return entities.filter((entity) => {
     return (
+      !entity.isDead &&
       entity.position.x < width * 2 &&
       entity.position.y < height * 2 &&
       entity.position.y > -height * 2 &&
@@ -177,6 +180,23 @@ function handleGamepad() {
   }
 }
 
+function handleEnemyCollision() {}
+
+function handleLaserCollision() {
+  let lasers = entities.filter((entity) => entity.tag === "laser");
+  let enemies = entities.filter((entity) => entity.tag === "enemy");
+
+  lasers.forEach((laser) => {
+    enemies.forEach((enemy) => {
+      if (laser.position.dist(enemy.position) < enemy.size.mag()) {
+        console.log("Hit");
+        enemy.isDead = true;
+        laser.isDead = true;
+      }
+    });
+  });
+}
+
 function spawnLaser(player) {
   let offset = createVector(player.size.x / 2 + 4, -player.size.y / 4);
   let laserSpeed = 20;
@@ -198,7 +218,7 @@ function spawnCloneTrouper() {
     levelBoundry.bottomRight.x,
     Math.random() * levelBoundry.topLeft.y,
   );
-  enemy.tag = "clone";
+  enemy.tag = "enemy";
   enemy.speed = createVector(-7, 0);
   enemy.gravity = createVector(0, 0);
   enemy.drag_factor = 1;
