@@ -1,5 +1,6 @@
 class Entity2d {
   constructor(image, scale = 1) {
+    this.tag = "";
     this.image = image;
     this.size = createVector(image.width * scale, image.height * scale);
     this.position = createVector(0, 0);
@@ -12,7 +13,6 @@ class Entity2d {
     this.bounce_factor = 0.3;
     this.drag_factor = 0.99;
     this.maxSpeed = null;
-    this.levelBoundry = null;
   }
 
   render(debug = false) {
@@ -43,7 +43,7 @@ class Entity2d {
         this.speed.x * 10,
         this.speed.y * 10,
         this.speed.x * 10 + this.acceleration.x * 10,
-        this.speed.y * 10 + this.acceleration.y * 10
+        this.speed.y * 10 + this.acceleration.y * 10,
       );
     }
 
@@ -63,22 +63,24 @@ class Entity2d {
     this.acceleration.add(this.gravity);
     this.speed.add(this.acceleration);
     this.speed.mult(this.drag_factor);
+
     if (this.maxSpeed) {
       this.speed.limit(this.maxSpeed);
     }
-    if (this.levelBoundry) {
-      this.position.add(this.speed);
 
+    this.position.add(this.speed);
+
+    if (this.levelBoundry) {
       this.position.x = constrain(
         this.position.x,
         this.levelBoundry.topLeft.x,
-        this.levelBoundry.bottomRight.x
+        this.levelBoundry.bottomRight.x,
       );
 
       this.position.y = constrain(
         this.position.y,
         this.levelBoundry.bottomRight.y,
-        this.levelBoundry.topLeft.y
+        this.levelBoundry.topLeft.y,
       );
     }
   }

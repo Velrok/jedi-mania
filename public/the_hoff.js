@@ -30,7 +30,7 @@ function setup() {
 
   levelDimensions = createVector(
     backgroundImg.width * backgroundImgScale,
-    backgroundImg.height * backgroundImgScale
+    backgroundImg.height * backgroundImgScale,
   );
 
   viewPort = {
@@ -102,10 +102,10 @@ function draw() {
 function filterOutDeadEntities(entities) {
   return entities.filter((entity) => {
     return (
-      entity.position.x < width &&
-      entity.position.y < height &&
-      entity.position.y > -height &&
-      entity.position.x > -width
+      entity.position.x < width * 2 &&
+      entity.position.y < height * 2 &&
+      entity.position.y > -height * 2 &&
+      entity.position.x > -width * 2
     );
   });
 }
@@ -133,7 +133,7 @@ function handleKeyboard() {
 function translateToViewPort() {
   translate(
     -(viewPort.position.x - viewPort.size.x / 2),
-    viewPort.position.y + viewPort.size.y / 2
+    viewPort.position.y + viewPort.size.y / 2,
   );
 }
 
@@ -167,6 +167,7 @@ function handleGamepad() {
       reloading = 10;
       laserShot = new Entity2d(laserShotImg);
       laserShot.position = player.position.copy().add(offset);
+      laserShot.tag = "laser";
       laserShot.size = createVector(20, 10);
       laserShot.speed = createVector(laserSpeed, 0);
       laserShot.gravity = createVector(0, 0);
@@ -174,22 +175,10 @@ function handleGamepad() {
 
       entities.push(laserShot);
     }
-
-    // console.log(leftXAxis);
-    // console.log(leftYAxis);
   }
 }
 
-function enemyAI() {
-  // fill("red");
-  // strokeWeight(12);
-  // line(-width, 0, width, 0);
-  // fill("yellow");
-  // line(0, -height, 0, height);
-  // if (cloneTroupers.position.y >= height || cloneTroupers.position.y <= 0) {
-  //   cloneTroupers.speed.y *= -1;
-  // }
-}
+function enemyAI() {}
 
 function keyPressed() {
   if (keyCode === D_KEY) {
@@ -211,13 +200,13 @@ function moveViewPort(direction) {
   viewPort.position.x = constrain(
     viewPort.position.x,
     width / 2,
-    bgWidth - width / 2
+    bgWidth - width / 2,
   );
 
   viewPort.position.y = constrain(
     viewPort.position.y,
     height / 2,
-    bgHeight - height / 2
+    bgHeight - height / 2,
   );
 }
 
