@@ -19,6 +19,7 @@ function preload() {
   riderCloneImg = loadImage("assets/rider_clone.png");
   backgroundImg = loadImage("assets/theHoff.png");
   laserShotImg = loadImage("assets/laser_shot_01.png");
+  boomImg = loadImage("assets/boom.png");
 }
 
 function setup() {
@@ -109,6 +110,7 @@ function updateViewPort() {
 function filterOutDeadEntities(entities) {
   return entities.filter((entity) => {
     return (
+      (entity.lifeTime == null || entity.lifeTime > 0) &&
       !entity.isDead &&
       entity.position.x < width * 2 &&
       entity.position.y < height * 2 &&
@@ -192,9 +194,18 @@ function handleLaserCollision() {
         console.log("Hit");
         enemy.isDead = true;
         laser.isDead = true;
+        spawnBoom(enemy.position.copy());
       }
     });
   });
+}
+
+function spawnBoom(position) {
+  boom = new Entity2d(boomImg, 1 / 2);
+  boom.position = position;
+  boom.gravity = createVector(0, 0);
+  boom.lifeTime = 60;
+  entities.push(boom);
 }
 
 function spawnLaser(player) {
