@@ -206,7 +206,11 @@ function spawnCloneTrouper() {
   entities.push(enemy);
 }
 
-function enemyAI() {}
+function enemyAI() {
+  if (frameCount % 80 === 0) {
+    spawnCloneTrouper();
+  }
+}
 
 function keyPressed() {
   if (keyCode === D_KEY) {
