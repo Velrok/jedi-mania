@@ -51,19 +51,6 @@ function setup() {
   player.maxSpeed = 15;
   entities.push(player);
 
-  cloneTroupers = new Entity2d(cloneTroupersImg, 1 / 100);
-  cloneTroupers.position = createVector(850, -100);
-  cloneTroupers.speed = createVector(0, -10);
-  cloneTroupers.gravity = createVector(0, 0);
-  cloneTroupers.drag_factor = 1;
-  entities.push(cloneTroupers);
-
-  // riderClone = new Entity2d(riderCloneImg);
-  // riderClone.position = createVector(20, -100);
-  // riderClone.gravity = createVector(0, 0);
-
-  center = createVector(20, height);
-
   createCanvas(width, height);
 }
 
@@ -179,26 +166,44 @@ function handleGamepad() {
     // viewPort.position.x += round(rightXAxis, 1) * 10;
     // viewPort.position.y += round(rightYAxis, 1) * 10;
 
-    let offset = createVector(player.size.x / 2 + 4, -player.size.y / 4);
-    let laserSpeed = 20;
-
     if (
       (controller.buttons[R1].pressed ||
         controller.buttons[X_BUTTON].pressed) &&
       reloading <= 0
     ) {
       reloading = 10;
-      laserShot = new Entity2d(laserShotImg);
-      laserShot.position = player.position.copy().add(offset);
-      laserShot.tag = "laser";
-      laserShot.size = createVector(20, 10);
-      laserShot.speed = createVector(laserSpeed, 0);
-      laserShot.gravity = createVector(0, 0);
-      laserShot.drag_factor = 1;
-
-      entities.push(laserShot);
+      spawnLaser(player);
     }
   }
+}
+
+function spawnLaser(player) {
+  let offset = createVector(player.size.x / 2 + 4, -player.size.y / 4);
+  let laserSpeed = 20;
+
+  laserShot = new Entity2d(laserShotImg);
+  laserShot.position = player.position.copy().add(offset);
+  laserShot.tag = "laser";
+  laserShot.size = createVector(20, 10);
+  laserShot.speed = createVector(laserSpeed, 0);
+  laserShot.gravity = createVector(0, 0);
+  laserShot.drag_factor = 1;
+
+  entities.push(laserShot);
+}
+
+function spawnCloneTrouper() {
+  enemy = new Entity2d(cloneTroupersImg, 1 / 10);
+  enemy.position = createVector(
+    levelBoundry.bottomRight.x,
+    Math.random() * levelBoundry.topLeft.y,
+  );
+  enemy.tag = "clone";
+  enemy.speed = createVector(-7, 0);
+  enemy.gravity = createVector(0, 0);
+  enemy.drag_factor = 1;
+
+  entities.push(enemy);
 }
 
 function enemyAI() {}
@@ -211,6 +216,9 @@ function keyPressed() {
     } else {
       console.log("Debug mode disabled");
     }
+  }
+  if (keyCode === S_KEY) {
+    spawnCloneTrouper();
   }
 }
 
